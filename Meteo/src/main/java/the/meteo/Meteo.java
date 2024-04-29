@@ -23,40 +23,44 @@ public class Meteo extends JFrame {
     private String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
 
     public Meteo() {
-        setTitle("Meteo Information");
-        setSize(400, 350); // Increased height to accommodate the location label
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setTitle("Meteo Information");
+    setSize(400, 350); // Increased height to accommodate the location label
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel inputPanel = new JPanel();
-        JLabel hourLabel = new JLabel("Hour:");
+    JPanel inputPanel = new JPanel();
+    JLabel hourLabel = new JLabel("Hour:");
 
-        // Create dropdown options
-        String[] hourOptions = createHourOptions();
-        hourComboBox = new JComboBox<>(hourOptions);
+    // Create dropdown options
+    String[] hourOptions = createHourOptions();
+    hourComboBox = new JComboBox<>(hourOptions);
 
-        JButton showTemperatureButton = new JButton("Hőmérséklet lekérése");
-        showTemperatureButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String selectedHour = (String) hourComboBox.getSelectedItem();
-                updateOutput(selectedHour);
-            }
-        });
-        inputPanel.add(hourLabel);
-        inputPanel.add(hourComboBox);
-        inputPanel.add(showTemperatureButton);
-        add(inputPanel, BorderLayout.NORTH);
+    JButton showTemperatureButton = new JButton("Hőmérséklet lekérése");
+    showTemperatureButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            String selectedHour = (String) hourComboBox.getSelectedItem();
+            updateOutput(selectedHour);
+        }
+    });
+    inputPanel.add(hourLabel);
+    inputPanel.add(hourComboBox);
+    inputPanel.add(showTemperatureButton);
+    add(inputPanel, BorderLayout.NORTH);
 
-        outputTextArea = new JTextArea();
-        outputTextArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputTextArea);
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
+    outputTextArea = new JTextArea();
+    outputTextArea.setEditable(false);
+    JScrollPane scrollPane = new JScrollPane(outputTextArea);
+    getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-        // Add location label
-        locationLabel = new JLabel("Location: Latitude 52.52, Longitude 13.41");
-        add(locationLabel, BorderLayout.SOUTH);
-        locationLabel = new JLabel("Location: Berlin");
-        add(locationLabel, BorderLayout.EAST);
-    }
+    // Create a panel for location label
+    JPanel locationPanel = new JPanel(new BorderLayout());
+    JLabel coordinatesLabel = new JLabel("  Latitude 52.52, Longitude 13.41");
+    JLabel cityLabel = new JLabel("Berlin  ");
+    locationPanel.add(coordinatesLabel, BorderLayout.WEST);
+    locationPanel.add(cityLabel, BorderLayout.EAST);
+    add(locationPanel, BorderLayout.SOUTH);
+}
+
+
 
     // Create dropdown options with all hours
     private String[] createHourOptions() {
