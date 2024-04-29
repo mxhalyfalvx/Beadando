@@ -53,7 +53,7 @@ public class Meteo extends JFrame {
 
     // Create a panel for location label
     JPanel locationPanel = new JPanel(new BorderLayout());
-    JLabel coordinatesLabel = new JLabel("  Latitude 52.52, Longitude 13.41");
+    JLabel coordinatesLabel = new JLabel(" Location: Latitude 52.52, Longitude 13.41");
     JLabel cityLabel = new JLabel("Berlin  ");
     locationPanel.add(coordinatesLabel, BorderLayout.WEST);
     locationPanel.add(cityLabel, BorderLayout.EAST);
@@ -94,7 +94,7 @@ public class Meteo extends JFrame {
             Date selectedDate = formatter.parse(selectedHour);
             // Display the selected date and time along with the hour and temperature
             outputTextArea.setText("Date and Time: " + selectedHour + "\n" +
-                    "Temperature (" + selectedHour + "): " + temperature + " °C");
+                    "Temperature : " + temperature + " °C");
         } catch (IOException | JSONException | ParseException e) {
             e.printStackTrace();
             outputTextArea.setText("Error occurred: " + e.getMessage());
