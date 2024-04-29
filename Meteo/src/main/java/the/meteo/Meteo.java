@@ -4,9 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -23,6 +22,7 @@ public class Meteo extends JFrame {
     private JComboBox<String> hourComboBox;
     private JLabel locationLabel;
     private String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
+    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
 
     public Meteo() {
         setTitle("Meteo Information");
@@ -74,40 +74,13 @@ public class Meteo extends JFrame {
         locationPanel.add(locationLabel);
 
         setVisible(true);
-        
-        // Add KeyListener to the frame to listen for Esc key press
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    System.exit(0);
-                }
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {}
-
-            @Override
-            public void keyReleased(KeyEvent e) {}
-        });
     }
 
     private String[] createHourOptions() {
         String[] options = new String[72];
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
         Date now = new Date();
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < 72; i++) {
             options[i] = formatter.format(now);
-            now = new Date(now.getTime() + 3600000);
-        }
-        now = new Date(now.getTime() + 86400000);
-        for (int i = 0; i < 24; i++) {
-            options[i + 24] = formatter.format(now);
-            now = new Date(now.getTime() + 3600000);
-        }
-        now = new Date(now.getTime() + 86400000);
-        for (int i = 0; i < 24; i++) {
-            options[i + 48] = formatter.format(now);
             now = new Date(now.getTime() + 3600000);
         }
         return options;
@@ -118,10 +91,12 @@ public class Meteo extends JFrame {
             JSONObject jsonData = new JSONObject(getJsonData(apiUrl));
             int hour = extractHour(selectedHour);
             double temperature = getTemperatureForHour(jsonData, hour);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
             Date selectedDate = formatter.parse(selectedHour);
             outputTextArea.setText("Date and Time: " + selectedHour + "\n" +
                     "Temperature : " + temperature + " °C");
+
+            // Write to CSV
+            writeDataToCSV(selectedHour, temperature);
         } catch (IOException | JSONException | ParseException e) {
             e.printStackTrace();
             outputTextArea.setText("Error occurred: " + e.getMessage());
@@ -166,6 +141,17 @@ public class Meteo extends JFrame {
             return response.toString();
         } else {
             throw new IOException("HTTP error code: " + responseCode);
+        }
+    }
+
+    private void writeDataToCSV(String selectedHour, double temperature) {
+        try (FileWriter writer = new FileWriter("C:\\Users\\szupe\\OneDrive\\Asztali gép\\Meteo.txt", true)) {
+            writer.append(selectedHour).append(",");
+            writer.append(String.valueOf(temperature)).append("\n");
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            outputTextArea.setText("Error occurred while writing to CSV: " + e.getMessage());
         }
     }
 
