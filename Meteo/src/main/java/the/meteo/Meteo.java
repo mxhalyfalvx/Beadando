@@ -19,11 +19,12 @@ import java.util.Date;
 public class Meteo extends JFrame {
     private JTextArea outputTextArea;
     private JComboBox<String> hourComboBox;
+    private JLabel locationLabel;
     private String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
 
     public Meteo() {
         setTitle("Meteo Information");
-        setSize(400, 300);
+        setSize(400, 350); // Increased height to accommodate the location label
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel inputPanel = new JPanel();
@@ -49,6 +50,12 @@ public class Meteo extends JFrame {
         outputTextArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputTextArea);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+        // Add location label
+        locationLabel = new JLabel("Location: Latitude 52.52, Longitude 13.41");
+        add(locationLabel, BorderLayout.SOUTH);
+        locationLabel = new JLabel("Location: Berlin");
+        add(locationLabel, BorderLayout.EAST);
     }
 
     // Create dropdown options with all hours
