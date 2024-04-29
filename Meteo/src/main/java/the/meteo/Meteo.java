@@ -13,8 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
 import java.util.Date;
 
 public class Meteo extends JFrame {
@@ -29,17 +28,16 @@ public class Meteo extends JFrame {
 
         JPanel inputPanel = new JPanel();
         JLabel hourLabel = new JLabel("Hour:");
-        
+
         // Create dropdown options
         String[] hourOptions = createHourOptions();
         hourComboBox = new JComboBox<>(hourOptions);
-        
+
         JButton showTemperatureButton = new JButton("Hőmérséklet lekérése");
         showTemperatureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String selectedHour = (String) hourComboBox.getSelectedItem();
-                int hour = extractHour(selectedHour);
-                updateOutput(hour);
+                updateOutput(selectedHour);
             }
         });
         inputPanel.add(hourLabel);
@@ -52,47 +50,51 @@ public class Meteo extends JFrame {
         JScrollPane scrollPane = new JScrollPane(outputTextArea);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
     }
-    
-    // Create dropdown options
+
+    // Create dropdown options with all hours
     private String[] createHourOptions() {
         String[] options = new String[72]; // 24 hours for today, tomorrow, and the day after
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime nextDay = now.plusDays(1);
-        LocalDateTime nextTwoDays = now.plusDays(2);
-        
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+        Date now = new Date();
         for (int i = 0; i < 24; i++) {
-            options[i] = "Today " + formatter.format(now.plusHours(i));
-            options[i + 24] = "Tomorrow " + formatter.format(nextDay.plusHours(i));
-            options[i + 48] = "Tomorrow+1 " + formatter.format(nextTwoDays.plusHours(i));
+            options[i] = formatter.format(now);
+            now = new Date(now.getTime() + 3600000); // Increment hour by one
         }
-        
+        now = new Date(now.getTime() + 86400000); // Move to tomorrow
+        for (int i = 0; i < 24; i++) {
+            options[i + 24] = formatter.format(now);
+            now = new Date(now.getTime() + 3600000); // Increment hour by one
+        }
+        now = new Date(now.getTime() + 86400000); // Move to the day after tomorrow
+        for (int i = 0; i < 24; i++) {
+            options[i + 48] = formatter.format(now);
+            now = new Date(now.getTime() + 3600000); // Increment hour by one
+        }
         return options;
     }
-    
+
+    private void updateOutput(String selectedHour) {
+        try {
+            JSONObject jsonData = new JSONObject(getJsonData(apiUrl));
+            int hour = extractHour(selectedHour);
+            double temperature = getTemperatureForHour(jsonData, hour);
+            // Get date and time corresponding to the selected hour
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+            Date selectedDate = formatter.parse(selectedHour);
+            // Display the selected date and time along with the hour and temperature
+            outputTextArea.setText("Date and Time: " + selectedHour + "\n" +
+                    "Temperature (" + selectedHour + "): " + temperature + " °C");
+        } catch (IOException | JSONException | ParseException e) {
+            e.printStackTrace();
+            outputTextArea.setText("Error occurred: " + e.getMessage());
+        }
+    }
+
     // Extract hour from the selected option
     private int extractHour(String selectedOption) {
         String[] parts = selectedOption.split(" ");
         String timePart = parts[1];
-        String[] timeParts = timePart.split(":");
-        return Integer.parseInt(timeParts[0]);
-    }
-
-    private void updateOutput(int hour) {
-        try {
-            JSONObject jsonData = new JSONObject(getJsonData(apiUrl));
-            double temperature = getTemperatureForHour(jsonData, hour);
-            // Get current date and time
-            Date currentDate = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String currentDateTime = dateFormat.format(currentDate);
-            // Display the current date and time along with the hour and temperature
-            outputTextArea.setText("Date and Time: " + currentDateTime + "\n" +
-                                   "Temperature (" + hour + ". hour): " + temperature + " °C");
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-            outputTextArea.setText("Error occurred: " + e.getMessage());
-        }
+        return Integer.parseInt(timePart.split(":")[0]);
     }
 
     public double getTemperatureForHour(JSONObject jsonData, int hour) throws JSONException {
