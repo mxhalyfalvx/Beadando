@@ -23,63 +23,71 @@ public class Meteo extends JFrame {
     private String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
 
     public Meteo() {
-    setTitle("Meteo Information");
-    setSize(400, 350); // Increased height to accommodate the location label
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Meteo Information");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the frame on the screen
 
-    JPanel inputPanel = new JPanel();
-    JLabel hourLabel = new JLabel("Hour:");
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel locationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        locationPanel.setBackground(new Color(235, 235, 235));
 
-    // Create dropdown options
-    String[] hourOptions = createHourOptions();
-    hourComboBox = new JComboBox<>(hourOptions);
+        JLabel hourLabel = new JLabel("Hour:");
+        hourComboBox = new JComboBox<>(createHourOptions());
+        JButton showTemperatureButton = new JButton("Get Temperature");
+        JButton exitButton = new JButton("Exit");
 
-    JButton showTemperatureButton = new JButton("Hőmérséklet lekérése");
-    showTemperatureButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            String selectedHour = (String) hourComboBox.getSelectedItem();
-            updateOutput(selectedHour);
-        }
-    });
-    inputPanel.add(hourLabel);
-    inputPanel.add(hourComboBox);
-    inputPanel.add(showTemperatureButton);
-    add(inputPanel, BorderLayout.NORTH);
+        showTemperatureButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String selectedHour = (String) hourComboBox.getSelectedItem();
+                updateOutput(selectedHour);
+            }
+        });
 
-    outputTextArea = new JTextArea();
-    outputTextArea.setEditable(false);
-    JScrollPane scrollPane = new JScrollPane(outputTextArea);
-    getContentPane().add(scrollPane, BorderLayout.CENTER);
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
-    // Create a panel for location label
-    JPanel locationPanel = new JPanel(new BorderLayout());
-    JLabel coordinatesLabel = new JLabel(" Location: Latitude 52.52, Longitude 13.41");
-    JLabel cityLabel = new JLabel("Berlin  ");
-    locationPanel.add(coordinatesLabel, BorderLayout.WEST);
-    locationPanel.add(cityLabel, BorderLayout.EAST);
-    add(locationPanel, BorderLayout.SOUTH);
-}
+        inputPanel.add(hourLabel);
+        inputPanel.add(hourComboBox);
+        inputPanel.add(showTemperatureButton);
+        inputPanel.add(exitButton);
 
+        outputTextArea = new JTextArea();
+        outputTextArea.setEditable(false);
 
+        JScrollPane scrollPane = new JScrollPane(outputTextArea);
+        mainPanel.add(inputPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(locationPanel, BorderLayout.SOUTH);
+        add(mainPanel);
 
-    // Create dropdown options with all hours
+        JLabel locationLabel = new JLabel("Berlin | Latitude: 52.52, Longitude: 13.41");
+        locationPanel.add(locationLabel);
+
+        setVisible(true);
+    }
+
     private String[] createHourOptions() {
-        String[] options = new String[72]; // 24 hours for today, tomorrow, and the day after
+        String[] options = new String[72];
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
         Date now = new Date();
         for (int i = 0; i < 24; i++) {
             options[i] = formatter.format(now);
-            now = new Date(now.getTime() + 3600000); // Increment hour by one
+            now = new Date(now.getTime() + 3600000);
         }
-        now = new Date(now.getTime() + 86400000); // Move to tomorrow
+        now = new Date(now.getTime() + 86400000);
         for (int i = 0; i < 24; i++) {
             options[i + 24] = formatter.format(now);
-            now = new Date(now.getTime() + 3600000); // Increment hour by one
+            now = new Date(now.getTime() + 3600000);
         }
-        now = new Date(now.getTime() + 86400000); // Move to the day after tomorrow
+        now = new Date(now.getTime() + 86400000);
         for (int i = 0; i < 24; i++) {
             options[i + 48] = formatter.format(now);
-            now = new Date(now.getTime() + 3600000); // Increment hour by one
+            now = new Date(now.getTime() + 3600000);
         }
         return options;
     }
@@ -89,10 +97,8 @@ public class Meteo extends JFrame {
             JSONObject jsonData = new JSONObject(getJsonData(apiUrl));
             int hour = extractHour(selectedHour);
             double temperature = getTemperatureForHour(jsonData, hour);
-            // Get date and time corresponding to the selected hour
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
             Date selectedDate = formatter.parse(selectedHour);
-            // Display the selected date and time along with the hour and temperature
             outputTextArea.setText("Date and Time: " + selectedHour + "\n" +
                     "Temperature : " + temperature + " °C");
         } catch (IOException | JSONException | ParseException e) {
@@ -101,7 +107,6 @@ public class Meteo extends JFrame {
         }
     }
 
-    // Extract hour from the selected option
     private int extractHour(String selectedOption) {
         String[] parts = selectedOption.split(" ");
         String timePart = parts[1];
