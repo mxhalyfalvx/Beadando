@@ -25,7 +25,7 @@ public class Meteo extends JFrame {
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
 
     public Meteo() {
-        setTitle("Meteo Information");
+        setTitle("Időjárásjelentés");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the frame on the screen
@@ -35,10 +35,10 @@ public class Meteo extends JFrame {
         JPanel locationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         locationPanel.setBackground(new Color(235, 235, 235));
 
-        JLabel hourLabel = new JLabel("Hour:");
+        JLabel hourLabel = new JLabel("Időpont:");
         hourComboBox = new JComboBox<>(createHourOptions());
-        JButton showTemperatureButton = new JButton("Get Temperature");
-        JButton exitButton = new JButton("Exit");
+        JButton showTemperatureButton = new JButton("Lekérdezés");
+        JButton exitButton = new JButton("Kilépés");
 
         showTemperatureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -70,7 +70,7 @@ public class Meteo extends JFrame {
         mainPanel.add(locationPanel, BorderLayout.SOUTH);
         add(mainPanel);
 
-        JLabel locationLabel = new JLabel("Berlin | Latitude: 52.52, Longitude: 13.41");
+        JLabel locationLabel = new JLabel("Berlin | Szélesség: 52.52°, Hosszúság: 13.41°");
         locationPanel.add(locationLabel);
 
         setVisible(true);
@@ -92,8 +92,11 @@ public class Meteo extends JFrame {
             int hour = extractHour(selectedHour);
             double temperature = getTemperatureForHour(jsonData, hour);
             Date selectedDate = formatter.parse(selectedHour);
-            outputTextArea.setText("Date and Time: " + selectedHour + "\n" +
-                    "Temperature : " + temperature + " °C");
+            outputTextArea.setText("Dátum és idő: " + selectedHour + "\n" +
+                    "Hőmérséklet : " + temperature + " °C");
+
+            // Set font to Arial
+            outputTextArea.setFont(new Font("Times New Roman", Font.BOLD, 16));
 
             // Write to CSV
             writeDataToCSV(selectedHour, temperature);
@@ -145,13 +148,13 @@ public class Meteo extends JFrame {
     }
 
     private void writeDataToCSV(String selectedHour, double temperature) {
-        try (FileWriter writer = new FileWriter("C:\\Users\\szupe\\OneDrive\\Asztali gép\\Meteo.txt", true)) {
+        try (FileWriter writer = new FileWriter("C:\\Users\\Admin\\Desktop\\Beadando\\Meteo.txt", true)) {
             writer.append(selectedHour).append(",");
             writer.append(String.valueOf(temperature)).append("\n");
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
-            outputTextArea.setText("Error occurred while writing to CSV: " + e.getMessage());
+            outputTextArea.setText("Error occurred while writing to TXT: " + e.getMessage());
         }
     }
 
