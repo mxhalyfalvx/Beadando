@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <script>
+        function updateTemperature() {
+            fetch("http://localhost:8080/temperature")
+                .then(response => response.text())
+                .then(temperature => {
+                    document.getElementById("temperature").innerText = "Latest temperature: " + temperature + " °C";
+                })
+                .catch(error => {
+                    console.error('Error fetching temperature:', error);
+                });
+        }
+
+        setInterval(updateTemperature, 600000); // Refresh every 10 minutes
+        window.onload = updateTemperature;
+    </script>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <div id="temperature">Loading...</div>
+</body>
+</html>

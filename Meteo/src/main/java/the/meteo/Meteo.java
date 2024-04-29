@@ -17,45 +17,52 @@ import org.json.JSONArray;
 
 public class Meteo extends JFrame {
     private JTextArea outputTextArea;
+    private JTextField hourTextField;
 
     public Meteo() {
         setTitle("Meteo Information");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        JPanel inputPanel = new JPanel();
+        JLabel hourLabel = new JLabel("Hour:");
+        hourTextField = new JTextField(5);
+        JButton showTemperatureButton = new JButton("Mutass hőmérsékletet");
+        showTemperatureButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int hour = Integer.parseInt(hourTextField.getText());
+                updateOutput(hour);
+            }
+        });
+        inputPanel.add(hourLabel);
+        inputPanel.add(hourTextField);
+        inputPanel.add(showTemperatureButton);
+        add(inputPanel, BorderLayout.NORTH);
+
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputTextArea);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                updateOutput();
-            }
-        }, 0, 10 * 60 * 1000); // Refresh every 10 minutes
     }
 
-    private void updateOutput() {
+    private void updateOutput(int hour) {
         try {
             String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
-            double latestTemperature = getLatestTemperature(apiUrl);
-            outputTextArea.setText("Latest temperature: " + latestTemperature + " °C");
+            double temperature = getTemperatureForHour(apiUrl, hour);
+            outputTextArea.setText("Hőmérséklet (" + hour + ". óra): " + temperature + " °C");
         } catch (IOException | JSONException e) {
             e.printStackTrace();
             outputTextArea.setText("Error occurred: " + e.getMessage());
         }
     }
 
-    public static double getLatestTemperature(String apiUrl) throws IOException, JSONException {
+    public static double getTemperatureForHour(String apiUrl, int hour) throws IOException, JSONException {
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            // Read the response into a string
             StringBuilder response = new StringBuilder();
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String line;
@@ -64,18 +71,19 @@ public class Meteo extends JFrame {
                 }
             }
 
-            // Parse JSON response
             JSONObject jsonResponse = new JSONObject(response.toString());
             JSONArray hourlyData = jsonResponse.getJSONObject("hourly").getJSONArray("temperature_2m");
 
-            // Get the latest temperature data from the array
-            double latestTemperature = hourlyData.getDouble(hourlyData.length() - 1); // Assuming the last entry is the latest temperature
-            return latestTemperature;
+            if (hour >= 0 && hour < hourlyData.length()) {
+                double temperature = hourlyData.getDouble(hour);
+                return temperature;
+            } else {
+                throw new IllegalArgumentException("Invalid hour: " + hour);
+            }
         } else {
             throw new IOException("HTTP error code: " + responseCode);
         }
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
