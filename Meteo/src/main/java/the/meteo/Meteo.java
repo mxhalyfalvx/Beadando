@@ -34,7 +34,9 @@ public class Meteo extends JFrame {
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JPanel locationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         locationPanel.setBackground(new Color(118, 21, 235));
-
+        inputPanel.setBackground(new Color(118, 21, 235));
+        
+        
         JLabel hourLabel = new JLabel("Időpont:");
         hourComboBox = new JComboBox<>(createHourOptions());
         JButton showTemperatureButton = new JButton("Lekérdezés");
@@ -63,14 +65,18 @@ public class Meteo extends JFrame {
 
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
+        outputTextArea.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align text horizontally
 
         JScrollPane scrollPane = new JScrollPane(outputTextArea);
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align scroll pane horizontally
+
         mainPanel.add(inputPanel, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(locationPanel, BorderLayout.SOUTH);
-        add(mainPanel);
+        add(mainPanel, BorderLayout.CENTER); // Center align main panel
 
-        JLabel locationLabel = new JLabel("Berlin | Szélesség: 52.52°, Hosszúság: 13.41°");
+        locationLabel = new JLabel("Berlin | Szélesség: 52.52°, Hosszúság: 13.41°");
+        locationLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align label text horizontally
         locationPanel.add(locationLabel);
 
         setVisible(true);
@@ -92,6 +98,7 @@ public class Meteo extends JFrame {
             int hour = extractHour(selectedHour);
             double temperature = getTemperatureForHour(jsonData, hour);
             Date selectedDate = formatter.parse(selectedHour);
+            outputTextArea.setBackground(new Color(118, 21, 235));
             outputTextArea.setText("Dátum és idő: " + selectedHour + "\n" +
                     "Hőmérséklet : " + temperature + " °C");
 
@@ -166,3 +173,4 @@ public class Meteo extends JFrame {
         });
     }
 }
+
