@@ -33,7 +33,7 @@ public class Meteo extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JPanel locationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        locationPanel.setBackground(new Color(235, 235, 235));
+        locationPanel.setBackground(new Color(118, 21, 235));
 
         JLabel hourLabel = new JLabel("Időpont:");
         hourComboBox = new JComboBox<>(createHourOptions());
@@ -99,7 +99,7 @@ public class Meteo extends JFrame {
             outputTextArea.setFont(new Font("Times New Roman", Font.BOLD, 16));
 
             // Write to CSV
-            writeDataToCSV(selectedHour, temperature);
+            writeDataToCSV(selectedHour, temperature, "Berlin"); // Pass the query source
         } catch (IOException | JSONException | ParseException e) {
             e.printStackTrace();
             outputTextArea.setText("Error occurred: " + e.getMessage());
@@ -147,14 +147,15 @@ public class Meteo extends JFrame {
         }
     }
 
-    private void writeDataToCSV(String selectedHour, double temperature) {
-        try (FileWriter writer = new FileWriter("C:\\Users\\Admin\\Desktop\\Beadando\\Meteo.txt", true)) {
+    private void writeDataToCSV(String selectedHour, double temperature, String source) {
+        try (FileWriter writer = new FileWriter("C:\\Users\\Admin\\Desktop\\Beadando\\Meteo.csv", true)) {
             writer.append(selectedHour).append(",");
-            writer.append(String.valueOf(temperature)).append("\n");
+            writer.append(String.valueOf(temperature)).append(",");
+            writer.append(source).append("\n");
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
-            outputTextArea.setText("Error occurred while writing to TXT: " + e.getMessage());
+            outputTextArea.setText("Error occurred while writing to CSV: " + e.getMessage());
         }
     }
 
