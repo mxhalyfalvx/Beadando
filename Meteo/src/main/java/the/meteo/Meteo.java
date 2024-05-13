@@ -28,7 +28,7 @@ public class Meteo extends JFrame {
         setTitle("Időjárásjelentés");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the frame on the screen
+        setLocationRelativeTo(null); // Kijelzőn középre igazítás
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -55,8 +55,7 @@ public class Meteo extends JFrame {
             }
         });
 
-        // Set 'Get Temperature' button as default button
-        getRootPane().setDefaultButton(showTemperatureButton);
+        getRootPane().setDefaultButton(showTemperatureButton); //alapgomb
 
         inputPanel.add(hourLabel);
         inputPanel.add(hourComboBox);
@@ -65,18 +64,18 @@ public class Meteo extends JFrame {
 
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
-        outputTextArea.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align text horizontally
+        outputTextArea.setAlignmentX(Component.CENTER_ALIGNMENT); // Horizontális középre igazítás (align)
 
         JScrollPane scrollPane = new JScrollPane(outputTextArea);
-        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align scroll pane horizontally
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT); // Horizontális középre igazítás (scroll)
 
         mainPanel.add(inputPanel, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(locationPanel, BorderLayout.SOUTH);
-        add(mainPanel, BorderLayout.CENTER); // Center align main panel
+        add(mainPanel, BorderLayout.CENTER); // Horizontális középre igazítás (main)
 
         locationLabel = new JLabel("Berlin | Szélesség: 52.52°, Hosszúság: 13.41°");
-        locationLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align label text horizontally
+        locationLabel.setHorizontalAlignment(SwingConstants.CENTER); // Horizontális középre igazítás (label text)
         locationPanel.add(locationLabel);
 
         setVisible(true);
@@ -102,11 +101,10 @@ public class Meteo extends JFrame {
             outputTextArea.setText("Dátum és idő: " + selectedHour + "\n" +
                     "Hőmérséklet : " + temperature + " °C");
 
-            // Set font to Arial
-            outputTextArea.setFont(new Font("Times New Roman", Font.BOLD, 16));
+            outputTextArea.setFont(new Font("Times New Roman", Font.BOLD, 16)); // Times New Roman betűtípus
 
-            // Write to CSV
-            writeDataToCSV(selectedHour, temperature, "Berlin"); // Pass the query source
+            // CSV
+            writeDataToCSV(selectedHour, temperature, "Berlin");
         } catch (IOException | JSONException | ParseException e) {
             e.printStackTrace();
             outputTextArea.setText("Error occurred: " + e.getMessage());
